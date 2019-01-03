@@ -121,6 +121,46 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!21 &175701063
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: IndexedTerrainMaterial(Clone)
+  m_Shader: {fileID: 4800000, guid: 03a70aea30bcd4d409b2627e62fd59a7, type: 3}
+  m_ShaderKeywords: 
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _AlbedoArray:
+        m_Texture: {fileID: 18700000, guid: 3a18215054b434c7bf83da3ae44c46dd, type: 2}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _IndexMap:
+        m_Texture: {fileID: -2564475890811210950, guid: 79628f60313186e43be5c7b4ea256179,
+          type: 2}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _NormalArray:
+        m_Texture: {fileID: 18700000, guid: 05a5a4c60440ccabdf5c3352ab7e2bd2, type: 2}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Floats:
+    - _DetailContrast: 4
+    m_Colors:
+    - _Color: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &224326354
 GameObject:
   m_ObjectHideFlags: 0
@@ -132,6 +172,7 @@ GameObject:
   - component: {fileID: 224326357}
   - component: {fileID: 224326356}
   - component: {fileID: 224326355}
+  - component: {fileID: 224326358}
   m_Layer: 0
   m_Name: Terrain_(0.0, 14.3, -500.0)
   m_TagString: Untagged
@@ -179,7 +220,7 @@ Terrain:
     serializedVersion: 2
     rgba: 4286545791
   m_LegacyShininess: 0.078125
-  m_MaterialTemplate: {fileID: 2100000, guid: 097207d9eae5b364c9bc3247db41f218, type: 2}
+  m_MaterialTemplate: {fileID: 175701063}
   m_BakeLightProbesForTrees: 1
   m_PreserveTreePrototypeLayers: 0
   m_DeringLightProbesForTrees: 1
@@ -201,6 +242,24 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &224326358
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 224326354}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_GeneratorAsset: {fileID: 0}
+  m_Script: {fileID: 11500000, guid: bad38f7a9632f8a408a89e3e49c1d627, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  indexMap: {fileID: 11400000, guid: 79628f60313186e43be5c7b4ea256179, type: 2}
+  albedoTextures: {fileID: 18700000, guid: 3a18215054b434c7bf83da3ae44c46dd, type: 2}
+  normalTextures: {fileID: 18700000, guid: 05a5a4c60440ccabdf5c3352ab7e2bd2, type: 2}
+  indexMaterial: {fileID: 2100000, guid: 097207d9eae5b364c9bc3247db41f218, type: 2}
+  localMaterialCopy: {fileID: 175701063}
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0

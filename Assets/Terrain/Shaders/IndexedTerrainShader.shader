@@ -1,6 +1,6 @@
 ﻿Shader "Nature/Terrain/Indexed" 
 {
-    Properties 
+    Properties
     {
         // used in fallback on old cards & base map
         [HideInInspector] _MainTex ("BaseMap (RGB)", 2D) = "white" {}
@@ -145,15 +145,6 @@ UNITY_INSTANCING_BUFFER_END(Terrain)
 			return pow(result, 4.0);// *result * result;
 		}
 
-		half ApplyFancyStep(half weight, half detail)
-		{
-			float z = lerp(0.2f, 0.8f, detail);
-			float m = 4.0f;
-			float u = pow(saturate(weight), z * exp2(m));
-			float v = pow(saturate(1.0 - weight), (1 - z) * exp2(m));
-			return u / (u + v);
-		}
-
 		// Note that mesh tangent space is equivalent to terrain space in the instanced case (before heightmap is applied, it's just a flat plane)
 		half3 GetGeomNormalMeshTangentSpace(Input IN)
 		{
@@ -231,7 +222,7 @@ UNITY_INSTANCING_BUFFER_END(Terrain)
 
 		void AccumulateMaterial(float2 texcoord, float3 geomPosWS, float3 geomNormalWS, half4 materialIndex, half weight, float2 uvcenter, inout SurfaceOutputStandard o)
 		{
-			float material = floor(materialIndex.r * 255.0f / 16.0f + 0.5f);
+			float material = floor(materialIndex.r * 255.0f + 0.5f);
 
 			// build random number for procedural random stuff
 			float rand = random(uvcenter);
@@ -245,11 +236,12 @@ UNITY_INSTANCING_BUFFER_END(Terrain)
 			// random scale - TODO: control scale from materialIndex
 			float scale = bbs(angleRand);
 
-			float angle = (angleRand * (2.0f * 3.14159265358979323f));
-			if (material == 3.0)
-			{
-				angle = 0.0f;
-			}
+			float angle = materialIndex.a * (2.0f * 3.14159265358979323f);
+//			float angle = (angleRand * (2.0f * 3.14159265358979323f));
+//			if (material == 3.0)
+//			{
+//				angle = 0.0f;
+//			}
 //			angle += _Time.x * 0.1f;		// animate rotation
 			float rx = sin(angle);
 			float ry = cos(angle);
@@ -281,16 +273,21 @@ UNITY_INSTANCING_BUFFER_END(Terrain)
 			
 			projDX = (projDX * 16.0f - 7.0f) / 7.0f;								// [-1, 1 1/7]		bounds here are not centered, so that 0x77 is exactly "up"
 			projDY = (projDY * 16.0f - 7.0f) / 7.0f;								// [-1, 1 1/7]
+
+//			projDX = 0.0f;		// force top down projection everywhere
+//			projDY = 0.0f;
+
 			float3 projF = normalize(float3(projDX, 0.5f, projDY));					// projection direction
 			float3 projU = normalize(cross(projF, float3(rot.x, 0.0f, rot.y)));		// U direction is defined by rotation
 			float3 projV = cross(projU, projF);										// V direction (don't have to normalize)
 
 			// project texcoords
 			scale = lerp(0.0625f, 0.125f, scale);			// TODO: per material scale bounds
+			scale = 0.0625f;								// fixed scale
 			matUV.x = dot(projU, geomPosWS) * scale;
 			matUV.y = dot(projV, geomPosWS) * scale;
 
-//			matUV.y += _Time.x * 0.3f;		// animate material in V
+//			matUV.y += _Time.x * 0.9f;		// animate material in V
 
 			// TODO: we may be able to calculate dudx, dudy from dpdx, dpdy and this projection.... would probably solve weird ddx issues across splats
 			
