@@ -97,11 +97,14 @@ namespace UnityEditor.Experimental.TerrainAPI
                 //                RenderTexture rt= indexMap.GetTempRenderTexture(true);
                 paintInProgress = true;
                 BrushTransform brushXform = TerrainPaintUtility.CalculateBrushTransform(terrain, editContext.uv, editContext.brushSize, 0.0f);
-                PaintContext ctx = PaintContext.CreateFromBounds(terrain, brushXform.GetBrushXYBounds(), 64, 64, 1);
-                ctx.CreateRenderTargets(RenderTextureFormat.ARGB32);
+
+                PaintContext indexCtx = PaintContext.CreateFromBounds(terrain, brushXform.GetBrushXYBounds(), 64, 64, 1);
+                indexCtx.CreateRenderTargets(RenderTextureFormat.ARGB32);
+
+                PaintContext normalCtx = TerrainPaintUtility.CollectNormals(terrain, brushXform.GetBrushXYBounds(), 2);
 
                 Material blitMaterial = TerrainPaintUtility.GetBlitMaterial();
-                ctx.Gather(
+                indexCtx.Gather(
                     TerrainToIndexMapTexture,
                     blitMaterial,
                     new Color(0.0f, 0.0f, 0.0f, 0.0f),
@@ -113,8 +116,9 @@ namespace UnityEditor.Experimental.TerrainAPI
 
                 Material paintMaterial = GetPaintMaterial();
 
+                float brushStrength = Event.current.shift ? -editContext.brushStrength : editContext.brushStrength;
                 Vector4 brushParams = new Vector4(
-                    editContext.brushStrength,
+                    brushStrength,
                     0.0f,
                     0.0f, 0.0f);
                 paintMaterial.SetTexture("_BrushTex", editContext.brushTexture);
@@ -133,33 +137,19 @@ namespace UnityEditor.Experimental.TerrainAPI
                     UnityEngine.Random.Range(0.0f, 1.0f));
                 paintMaterial.SetVector("_randoms", randoms);
 
-                TerrainPaintUtility.SetupTerrainToolMaterialProperties(ctx, brushXform, paintMaterial);
-                Graphics.Blit(ctx.sourceRenderTexture, ctx.destinationRenderTexture, paintMaterial, 0);
+                TerrainPaintUtility.SetupTerrainToolMaterialProperties(indexCtx, brushXform, paintMaterial);
+                Graphics.Blit(indexCtx.sourceRenderTexture, indexCtx.destinationRenderTexture, paintMaterial, 0);
 
                 //  ctx.ScatterToTexture()          // we should do this ... less temp render textures
                 // and users don't have to store render textures at all...
-                ctx.Scatter(
+                indexCtx.Scatter(
                     TerrainToIndexMapRenderTexture,
                     blitMaterial,
                     null,
                     null);
-/*
-                    c => {
-                        RenderTexture rt = c.userData as RenderTexture;
-                        if (rt != null)
-                        {
-                            MaterialManager localmgr = c.terrain.GetComponent<MaterialManager>();
-                            if (localmgr != null)
-                            {
-                                RenderTexture.active = ctx.oldRenderTexture;
-                                IndexMap indexMap = localmgr.GetIndexMap();
-                                indexMap.CopyFromRenderTexture(rt, true);
-                                c.userData = null;
-                            }
-                        }
-                    });
-*/
-                ctx.Cleanup();
+
+                normalCtx.Cleanup();
+                indexCtx.Cleanup();
             }
 
             /*

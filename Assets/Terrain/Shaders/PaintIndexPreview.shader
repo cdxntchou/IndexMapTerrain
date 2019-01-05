@@ -87,7 +87,7 @@
                 float brushStripe = Stripe(brushSample, stripeLocation, stripeWidth);
 
                 float4 color = float4(1.0f, 0.5f, 0.5f, 1.0f) * saturate(brushStripe + 0.5f * brushSample);
-                color.a = 0.6f * saturate(brushSample * 5.0f);
+                color.a = 0.2f * saturate(brushSample * 5.0f);
 				return color * oob;
             }
             ENDCG

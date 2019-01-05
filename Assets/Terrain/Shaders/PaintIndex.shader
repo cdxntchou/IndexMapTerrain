@@ -101,20 +101,42 @@
 
 				float4 indexMap = tex2D(_MainTex, indexmapUV);
 
-                float brushStrength = oob * UnpackHeightmap(tex2D(_BrushTex, brushUV));
+				float brushStrength = 2.0f * BRUSH_OPACITY * oob * UnpackHeightmap(tex2D(_BrushTex, brushUV));
+//                float brushStrength = oob * UnpackHeightmap(tex2D(_BrushTex, brushUV));
 				float brushThreshold = clamp(1.0f - BRUSH_OPACITY, 0.15f, 0.99f);
 
-				if (brushStrength > brushThreshold)
-				{
-					indexMap.r = (materialIndex + 0.25f) / 255.0;
+				// build random number for procedural random stuff
+				float rand = random(indexmapUV);
+				rand = bbs(rand);
 
-					// build random number for procedural random stuff
-					float rand = random(indexmapUV);
-					rand = bbs(rand);
+				float oldMaterial = floor(indexMap.r * 255.0f + 0.5f);
+				bool set = false;
+				if (oldMaterial == materialIndex)
+				{
+					// increase weight
+					indexMap.g = saturate(indexMap.g + brushStrength);
+				}
+				else
+				{
+					indexMap.g = indexMap.g - brushStrength;
+					if (indexMap.g <= 0.0f)
+					{
+						set = true;
+					}
+				}
+
+				if (set)
+				{
+					indexMap.g = abs(indexMap.g);
+					indexMap.r = (materialIndex + 0.25f) / 255.0;
 
 					// random rotation
 					indexMap.a = lerp(ROTATE_MIN, ROTATE_MAX, rand);
 					rand = bbs(rand);
+				}
+				else
+				{
+					indexMap.g = saturate(indexMap.g);
 				}
 
 				return indexMap;
