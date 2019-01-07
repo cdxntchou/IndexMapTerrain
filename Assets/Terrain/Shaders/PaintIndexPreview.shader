@@ -86,7 +86,9 @@
 				float stripeLocation = 0.70; // clamp(1.0f - BRUSH_OPACITY, 0.15f, 0.99f);		// at 20% alpha
                 float brushStripe = Stripe(brushSample, stripeLocation, stripeWidth);
 
-                float4 color = float4(1.0f, 0.5f, 0.5f, 1.0f) * saturate(brushStripe + 0.5f * brushSample);
+				float brushStripeOuter = Stripe(brushSample, 0.15f, stripeWidth);
+
+                float4 color = float4(1.0f, 0.5f, 0.5f, 1.0f) * saturate(0.7f * brushStripe + brushStripeOuter + 0.5f * brushSample);
                 color.a = 0.4f * saturate(brushSample * 5.0f);
 				return color * oob;
             }
