@@ -122,7 +122,7 @@ public class IndexMap : ScriptableObject, ISerializationCallbackReceiver
         {
             if (useRenderTexture)
             {
-                Debug.Log("IndexMap copyBack!");
+//                Debug.Log("IndexMap copyBack!");
                 CopyFromRenderTexture(renderTexture, false);
                 EditorUtility.SetDirty(indexMap);
                 useRenderTexture = false;

@@ -124,6 +124,14 @@ namespace UnityEditor.Experimental.TerrainAPI
                 paintMaterial.SetTexture("_BrushTex", editContext.brushTexture);
                 paintMaterial.SetVector("_BrushParams", brushParams);
                 paintMaterial.SetFloat("materialIndex", materialIndex);
+                paintMaterial.SetTexture("_NormalMap", normalCtx.sourceRenderTexture);
+
+                Vector4 indexToNormalXform;
+                TerrainPaintUtility.BuildTransformPaintContextUVToPaintContextUV(
+                    indexCtx,
+                    normalCtx,
+                    out indexToNormalXform);
+                paintMaterial.SetVector("_indexToNormalXform", indexToNormalXform);
 
                 Vector4 xformParams = new Vector4();
                 xformParams.x = (randomRotation ? minRotation : fixedRotation) / 360.0f;

@@ -79,6 +79,10 @@
 			#define RANDOM2				(_randoms.z)
 			#define RANDOM3				(_randoms.w)
 
+			sampler2D _NormalMap;
+			float4 _NormalMap_TexelSize;      // 1/width, 1/height, width, height
+			float4 _indexToNormalXform;
+
 			float bbs(float input)
 			{
 				return frac(dot(input*input, 251.0f));
@@ -95,14 +99,18 @@
             {
                 float2 brushUV = PaintContextUVToBrushUV(i.pcUV);
 				float2 indexmapUV = i.pcUV;
+				float2 normalmapUV = i.pcUV * _indexToNormalXform.xy + _indexToNormalXform.zw;
 
 				// out of bounds multiplier
 				float oob = all(saturate(brushUV) == brushUV) ? 1.0f : 0.0f;
 
 				float4 indexMap = tex2D(_MainTex, indexmapUV);
 
-				float brushStrength = 2.0f * BRUSH_OPACITY * oob * UnpackHeightmap(tex2D(_BrushTex, brushUV));
-//                float brushStrength = oob * UnpackHeightmap(tex2D(_BrushTex, brushUV));
+				float brushShape = UnpackHeightmap(tex2D(_BrushTex, brushUV));
+				brushShape *= brushShape;
+
+				// we double the strength to guarantee 100% opacity will give the correct shape
+				float brushStrength = 2.0f * BRUSH_OPACITY * oob * brushShape;
 				float brushThreshold = clamp(1.0f - BRUSH_OPACITY, 0.15f, 0.99f);
 
 				// build random number for procedural random stuff
@@ -113,12 +121,15 @@
 				bool set = false;
 				if (oldMaterial == materialIndex)
 				{
-					// increase weight
+					// existing material is the target material
+					// increase it's weight by brushStrength
 					indexMap.g = saturate(indexMap.g + brushStrength);
 				}
 				else
 				{
-					indexMap.g = indexMap.g - brushStrength;
+					// existing material is NOT the target material
+					// decrease it's weight by brushStrength (reduced if brushStrength is negative)
+					indexMap.g = indexMap.g - brushStrength * (brushStrength < 0.0f ? 0.4f : 1.0f);
 					if (indexMap.g <= 0.0f)
 					{
 						set = true;
@@ -127,8 +138,23 @@
 
 				if (set)
 				{
+					// weight
 					indexMap.g = abs(indexMap.g);
+
+					// material index
 					indexMap.r = (materialIndex + 0.25f) / 255.0;
+
+					// projection direction -- sample normal map
+					// TODO: could probably do something better by analyzing the local area to find a best-fit direction
+					// this currently assumes the center sample is representative...
+					float4 normalMap = tex2D(_NormalMap, normalmapUV);
+					float3 normal = normalize(normalMap.xyz * 2.0f - 1.0f);
+
+					// encode into 4:4 format for blue channel
+					float2 proj = 0.5f * (normal.xz / normal.y);			// scale normal.y to 0.5, and the .xz components are the projDXY
+					proj = clamp(floor(proj * 7.0f + 7.25f), 0, 15);		// [0, 15]
+					float encoded = proj.y * 16.0f + proj.x;				// [0, 255]
+					indexMap.b = (encoded + 0.5f) / 255.0f;
 
 					// random rotation
 					indexMap.a = lerp(ROTATE_MIN, ROTATE_MAX, rand);
