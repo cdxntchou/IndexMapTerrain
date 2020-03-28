@@ -28,7 +28,7 @@ namespace TextureArrayInspector
 				src = src.ResizedClone(dstArr.width, dstArr.height);
 			
 			#if UNITY_EDITOR	
-			UnityEditor.EditorUtility.CompressTexture(src, dstArr.format, (int) TextureCompressionQuality.Best);  //de-compress and compress to change the format
+			UnityEditor.EditorUtility.CompressTexture(src, dstArr.format, (int) UnityEditor.TextureCompressionQuality.Best);  //de-compress and compress to change the format
 			#else
 			if (dstArr.format.IsCompressed()) src.Compress(true);
 			#endif
@@ -114,7 +114,7 @@ namespace TextureArrayInspector
 				tmpTex = tmpTex.ResizedClone(dst.width, dst.height);
 
 			#if UNITY_EDITOR
-			UnityEditor.EditorUtility.CompressTexture(tmpTex, dst.format, (int) TextureCompressionQuality.Best);  //de-compress and compress to change the format
+			UnityEditor.EditorUtility.CompressTexture(tmpTex, dst.format, (int) UnityEditor.TextureCompressionQuality.Best);  //de-compress and compress to change the format
 			#else
 			if (dst.format.IsCompressed()) tmpTex.Compress(true);
 			#endif

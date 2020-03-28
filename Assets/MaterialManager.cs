@@ -92,7 +92,7 @@ public class MaterialManager : MonoBehaviour
         else
         {
             terrain.drawInstanced = true;
-            terrain.materialType = Terrain.MaterialType.Custom;
+            // terrain.materialType = Terrain.MaterialType.Custom;
             terrain.materialTemplate = GetTerrainMaterial();
         }
     }

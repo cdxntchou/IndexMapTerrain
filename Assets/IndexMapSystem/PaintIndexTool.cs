@@ -64,7 +64,7 @@ namespace UnityEditor.Experimental.TerrainAPI
             return paintMaterial;
         }
 
-        public static Texture TerrainToIndexMapTexture(PaintContext.ITerrainContext context)
+        public static Texture TerrainToIndexMapTexture(PaintContext.ITerrainInfo context)
         {
             Texture result = null;
             MaterialManager mgr = context.terrain.GetComponent<MaterialManager>();
@@ -76,7 +76,7 @@ namespace UnityEditor.Experimental.TerrainAPI
             return result;
         }
 
-        public static RenderTexture TerrainToIndexMapRenderTexture(PaintContext.ITerrainContext context)
+        public static RenderTexture TerrainToIndexMapRenderTexture(PaintContext.ITerrainInfo context)
         {
             RenderTexture result = null;
             MaterialManager mgr = context.terrain.GetComponent<MaterialManager>();
@@ -106,8 +106,8 @@ namespace UnityEditor.Experimental.TerrainAPI
                 Material blitMaterial = TerrainPaintUtility.GetBlitMaterial();
                 indexCtx.Gather(
                     TerrainToIndexMapTexture,
-                    blitMaterial,
                     new Color(0.0f, 0.0f, 0.0f, 0.0f),
+                    blitMaterial, 0,
                     null,       // before
                     null);      // after
 
@@ -152,7 +152,7 @@ namespace UnityEditor.Experimental.TerrainAPI
                 // and users don't have to store render textures at all...
                 indexCtx.Scatter(
                     TerrainToIndexMapRenderTexture,
-                    blitMaterial,
+                    blitMaterial, 0,
                     null,
                     null);
 
