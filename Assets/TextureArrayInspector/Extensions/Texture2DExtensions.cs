@@ -199,6 +199,7 @@ namespace TextureArrayInspector
 
 			public static void SaveAsPNG (this Texture2D origTex, string savePath, bool linear=false, bool normal=false)
 			{
+/*
 				Texture2D tex = origTex;
 
 				if (!tex.IsReadable()) tex = tex.ReadableClone();
@@ -219,11 +220,12 @@ namespace TextureArrayInspector
 				}
 
 				savePath = savePath.Replace(Application.dataPath, "Assets");
-				System.IO.File.WriteAllBytes(savePath, tex.EncodeToPNG());
+				System.IO.File.WriteAllBytes(savePath, ImageConversion.EncodeToPNG(tex));
 
 				#if UNITY_EDITOR
 				UnityEditor.AssetDatabase.Refresh();
 				#endif
+*/
 			}
 
 			public static Hash128 GetHash (this Texture2D tex)
