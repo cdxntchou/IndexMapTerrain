@@ -1,5 +1,7 @@
 # IndexMapTerrain
 
+Works in Unity 2019.4.28f1
+
 Example of using PaintContext.Gather/Scatter to implement Terrain tools that paint to custom textures.
 
 Here the custom texture is an R8G8B8A8 index map, used as a replacement for the splatmaps.
